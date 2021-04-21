@@ -108,7 +108,11 @@ function viewEmployees() {
 }
 
 function createEmployeeTable (values) {
-    console.table(['id', 'first_name', 'last_name'], values);
+    if (values.length !== 0) {
+        console.table(['id', 'first_name', 'last_name'], values)
+    } else {
+        log(chalk.red('No employees are in your database.'))};
+
     start();
 }
 
