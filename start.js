@@ -20,7 +20,6 @@ logo();
 
 function logo () {
     log(chalk.blue(` 
-
     -----------------------------------------------------------------------------
      ${chalk.green(`
          _______  __   __  _______  ___      _______  __   __  _______  _______ 
@@ -83,6 +82,7 @@ function start() {
                 break;
 
             case 'Exit':
+                log(chalk.yellow(`Goodbye! ${chalk.magenta(`ヾ(°∇°*)`)}`));
                 connection.end();
                 break;
         
