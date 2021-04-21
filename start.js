@@ -3,12 +3,13 @@ const chalk = require('chalk');
 const log = console.log;
 const mysql = require('mysql');
 const cTable = require('console.table');
+const password = require('./password');
 
 const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: '',
+    password: password,
     database: 'employee_db',
 });
   
