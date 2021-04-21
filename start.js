@@ -1,6 +1,20 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 const mysql = require('mysql');
+const cTable = require('console.table');
+
+const connection = mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: '',
+    database: 'employee_db',
+});
+
+connection.connect((err) => {
+if (err) throw err;
+start();
+});
 
 function start() {
     inquirer
@@ -21,19 +35,16 @@ function start() {
             case 'View all Employees':
                 viewEmployees();
                 break;
-
             case 'View All Employees by Department':
-
+            
                 break; 
-
+                
             case 'View all Employees by Manager':
                 return;
             break;
-
             case 'Exit':
-
             break;
-
+        
             default:
                 console.log(`Invalid action: ${answer.action}`);
             break;
@@ -42,6 +53,27 @@ function start() {
 }
 
 function viewEmployees() {
+    const query = 'SELECT id, first_name, last_name FROM employee';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.log(res);
+        connection.end();
+    });
+
+    const table = cTable.getTable([
+        {
+            name: 'foo',
+            age: 10,
+        } , {
+            name: 'bar',
+            age: 20
+        }
+    ]);
+
+    console.log(table);
+}
+
+function viewDepartment() {
     inquirer
         .prompt([{
             type: 'input',
@@ -68,5 +100,3 @@ function viewEmployees() {
         console.log(response);
     })
 }
-
-start(); 
