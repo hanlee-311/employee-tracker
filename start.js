@@ -53,24 +53,22 @@ function start() {
 }
 
 function viewEmployees() {
+    let employeeArray = [];
+
     const query = 'SELECT id, first_name, last_name FROM employee';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.log(res);
-        connection.end();
+        res.forEach(({id, first_name, last_name}) => {
+            let values = [id, first_name, last_name];
+            employeeArray.push(values);
+        })
+        return createEmployeeTable(employeeArray);
     });
+}
 
-    const table = cTable.getTable([
-        {
-            name: 'foo',
-            age: 10,
-        } , {
-            name: 'bar',
-            age: 20
-        }
-    ]);
-
-    console.log(table);
+function createEmployeeTable (values) {
+    console.table(['id', 'first_name', 'last_name'], values);
+    start();
 }
 
 function viewDepartment() {
