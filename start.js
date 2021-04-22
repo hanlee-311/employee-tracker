@@ -4,6 +4,7 @@ const log = console.log;
 const mysql = require('mysql');
 const cTable = require('console.table');
 const password = require('./password');
+const { printTable } = require('console-table-printer');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -94,22 +95,16 @@ function start() {
 }
 
 function viewEmployees() {
-    let employeeArray = [];
-
-    const query = 'SELECT id, first_name, last_name FROM employee';
+    const query = 'SELECT employee.id, employee.first_name, employee.last_name, roletable.title, department.name, roletable.salary FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        res.forEach(({id, first_name, last_name}) => {
-            let values = [id, first_name, last_name];
-            employeeArray.push(values);
-        })
-        return createEmployeeTable(employeeArray);
+        createEmployeeTable(res);
     });
 }
 
 function createEmployeeTable (values) {
     if (values.length !== 0) {
-        console.table(['id', 'first_name', 'last_name'], values)
+       printTable(values);
     } else {
         log(chalk.red('No employees are in your database.'))};
 
