@@ -13,13 +13,13 @@ const connection = mysql.createConnection({
     password: password,
     database: 'employee_db',
 });
-  
+
 connection.connect((err) => {
-if (err) throw err;
-logo();
+    if (err) throw err;
+    logo();
 });
 
-function logo () {
+function logo() {
     log(chalk.blue(` 
     -----------------------------------------------------------------------------
      ${chalk.green(`
@@ -57,41 +57,42 @@ function start() {
                 'Add Employee',
                 'Remove Employee',
                 'Exit',
-              ],
+            ],
         }
-    ])
-    .then ((response) => {
-        switch (response.action) {
-            case 'View all Employees':
-                viewEmployees();
-                break;
+        ])
+        .then((response) => {
+            switch (response.action) {
+                case 'View all Employees':
+                    viewEmployees();
+                    break;
 
-            case 'View All Employees by Department':
-            
-                break; 
-                
-            case 'View all Employees by Manager':
-                
-                break;
+                case 'View All Employees by Department':
+                    selectDepartment();
+                    break;
 
-            case 'Add Employee':
-                
-                break;
+                case 'View all Employees by Manager':
 
-            case 'Remove Employee':
-                
-                break;
+                    break;
 
-            case 'Exit':
-                log(chalk.yellow(`Goodbye! ${chalk.magenta(`ヾ(°∇°*)`)}`));
-                connection.end();
-                break;
-        
-            default:
-                console.log(`Invalid action: ${answer.action}`);
-                break;
-        }
-    })
+                case 'Add Employee':
+
+                    break;
+
+                case 'Remove Employee':
+
+                    break;
+
+                case 'Exit':
+                    log(chalk.yellow(`Goodbye! ${chalk.magenta(`ヾ(°∇°*)`)}`));
+                    connection.end();
+                    break;
+
+                default:
+                    console.log(`Invalid action: ${answer.action}`);
+                    start();
+                    break;
+            }
+        })
 }
 
 function viewEmployees() {
@@ -102,39 +103,50 @@ function viewEmployees() {
     });
 }
 
-function createEmployeeTable (values) {
+function createEmployeeTable(values) {
     if (values.length !== 0) {
-       printTable(values);
+        printTable(values);
     } else {
-        log(chalk.red('No employees are in your database.'))};
+        log(chalk.red('No employees are in your database.'))
+    };
 
     start();
 }
 
-function viewDepartment() {
-    inquirer
-        .prompt([{
-            type: 'input',
-            message: `What is the team manager's name?`,
-            name: 'managerName'
-        },
-        {
-            type:'input',
-            message: `What is the team manager's employee ID?`,
-            name: 'managerId',
-        },
-        {
-            type: 'input',
-            message: `What is the team manager's email address?`,
-            name: 'managerEmail',
-        },
-        {
-            type: 'input',
-            message: `What is the team manager's office number?`,
-            name: 'office',
-        },
-    ])
-    .then ((response) => {
-        console.log(response);
-    })
+function selectDepartment() {
+    const query = 'SELECT * FROM department';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Which department would you like to view?`,
+                name: 'departmentName',
+                choices() {
+                    const choiceArray = [];
+                    res.forEach(({ name }) => {
+                        choiceArray.push(name);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                viewDepartment(response);
+            })
+    });
+}
+
+function viewDepartment(response) {
+    const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name, roletable.title, department.name AS department, roletable.salary FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        let newTable = res.filter((name) => {
+            return response.departmentName == name.department;
+        })
+        console.log(newTable)
+
+        createEmployeeTable(newTable);
+    });
 }
