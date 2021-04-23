@@ -75,7 +75,7 @@ function start() {
                     break;
 
                 case 'Add Employee':
-
+                    addEmployee();
                     break;
 
                 case 'Remove Employee':
@@ -145,8 +145,48 @@ function viewDepartment(response) {
         let newTable = res.filter((name) => {
             return response.departmentName == name.department;
         })
-        console.log(newTable)
 
         createEmployeeTable(newTable);
     });
+}
+
+function addEmployee() {
+    const query = 'SELECT * FROM roletable';
+
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        inquirer
+            .prompt([{
+                type: 'input',
+                message: `What is the employee's first name?`,
+                name: 'employeeFirstName',
+            },
+            {
+                type: 'input',
+                message: `What is the employee's last name?`,
+                name: 'employeeLastName',
+            },
+            {
+                type: 'list',
+                message: `What is the employee's role?`,
+                name: 'employeeRole',
+                choices() {
+                    const choiceArray = [];
+                    res.forEach(({ title }) => {
+                        choiceArray.push( title );
+                    });
+                    return choiceArray;
+                },
+            },
+                // {
+                //     type: 'input',
+                //     message: `What is the employee's first name?`,
+                //     name: 'employeeName',
+                // },
+            ])
+            .then((response) => {
+                console.log(response);
+            })
+        })
 }
