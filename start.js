@@ -2,7 +2,6 @@ const inquirer = require('inquirer');
 const chalk = require('chalk');
 const log = console.log;
 const mysql = require('mysql');
-const cTable = require('console.table');
 const password = require('./password');
 const { printTable } = require('console-table-printer');
 
@@ -181,12 +180,22 @@ function addEmployee() {
             },
                 // {
                 //     type: 'input',
-                //     message: `What is the employee's first name?`,
-                //     name: 'employeeName',
+                //     message: `Who is the employee's manager?`,
+                //     name: 'managerName',
                 // },
             ])
             .then((response) => {
-                console.log(response);
+                connection.query(`INSERT INTO employee SET ?`,
+                {
+                    first_name: response.employeeFirstName,
+                    last_name: response.employeeLastName,
+                },
+                (err) => {
+                    if (err) throw err;
+                    console.log('Yay!');
+                    start();
+                }
+                )
             })
         })
 }
