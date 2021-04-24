@@ -173,7 +173,7 @@ function addEmployee() {
                 choices() {
                     const choiceArray = [];
                     res.forEach(({ title }) => {
-                        choiceArray.push( title );
+                        choiceArray.push(title);
                     });
                     return choiceArray;
                 },
@@ -185,17 +185,37 @@ function addEmployee() {
                 // },
             ])
             .then((response) => {
-                connection.query(`INSERT INTO employee SET ?`,
-                {
-                    first_name: response.employeeFirstName,
-                    last_name: response.employeeLastName,
-                },
-                (err) => {
+                connection.query(`SELECT roletable.id, roletable.title FROM roletable`, (err, res) => {
                     if (err) throw err;
-                    console.log('Yay!');
-                    start();
-                }
-                )
+
+                    let roleInfo = res.filter((id) => {
+                        return response.employeeRole == id.title
+                    });
+                    let roleId = JSON.parse(JSON.stringify(roleInfo))[0].id
+                    addRoleAndInfo(roleId, response);
+                })
             })
-        })
+    })
 }
+
+function addRoleAndInfo(id, response) {
+    connection.query(`INSERT INTO employee SET?`,
+        {
+            first_name: response.employeeFirstName,
+            last_name: response.employeeLastName,
+            role_id: id,
+        },
+        (err) => {
+            if (err) throw err;
+            console.log('Yay!');
+            start();
+        }
+    )
+
+}
+
+
+
+
+
+
