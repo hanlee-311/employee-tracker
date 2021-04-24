@@ -59,6 +59,7 @@ function start() {
                 'View Roles',
                 'View Departments',
                 'Add Roles',
+                'Total Utilized Budget By Department',
                 'Exit',
             ],
         }
@@ -101,6 +102,10 @@ function start() {
                     addRoles();
                     break;
 
+                case 'Total Utilized Budget By Department':
+                    calculateBudget();
+                    break;
+
                 case 'Exit':
                     log(chalk.yellow(`Goodbye! ${chalk.magenta(`ヾ(°∇°*)`)}`));
                     connection.end();
@@ -127,10 +132,10 @@ function createTable(values) {
 
 //function to view all employees
 function viewEmployees() {
-    const query = 'SELECT employee.id, employee.first_name, employee.last_name, roletable.title, department.name AS department, roletable.salary, CONCAT (employee.first_name, " ", employee.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id';
+    const query = 'SELECT employee.id, employee.first_name, employee.last_name, roletable.title, department.name AS department, roletable.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        createEmployeeTable(res);
+        createTable(res);
     });
 }
 
@@ -337,7 +342,7 @@ function viewDepartments() {
     });
 }
 
-//function to add a new role
+//functions to add a new role
 function addRoles() {
     const query = 'SELECT * FROM department';
 
@@ -395,4 +400,8 @@ function addDepartmentAndInfo(id, response) {
             start();
         }
     )
+}
+
+function calculateBudget() {
+    connection.end();
 }
