@@ -56,6 +56,7 @@ function start() {
                 'Add Employee',
                 "Update Employee Information",
                 'Remove Employee',
+                'View Roles',
                 'Exit',
             ],
         }
@@ -84,6 +85,10 @@ function start() {
 
                 case 'Remove Employee':
                     removeEmployee();
+                    break;
+
+                case 'View Roles':
+                    viewRoles();
                     break;
 
                 case 'Exit':
@@ -297,4 +302,12 @@ function updateEmployee() {
 function updateEmployeeInformation(id, name) {
     console.log(id, name);
     start();
+}
+
+function viewRoles() {
+    const query = 'SELECT roletable.id, roletable.title, roletable.salary, department.name AS department FROM roletable LEFT JOIN department on roletable.department_id = department.id';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        createEmployeeTable(res);
+    });
 }
