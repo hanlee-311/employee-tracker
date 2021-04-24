@@ -57,6 +57,7 @@ function start() {
                 "Update Employee Information",
                 'Remove Employee',
                 'View Roles',
+                'View Departments',
                 'Exit',
             ],
         }
@@ -91,6 +92,11 @@ function start() {
                     viewRoles();
                     break;
 
+                case 'View Departments':
+                    viewDepartments();
+                    break;
+
+
                 case 'Exit':
                     log(chalk.yellow(`Goodbye! ${chalk.magenta(`ヾ(°∇°*)`)}`));
                     connection.end();
@@ -112,11 +118,11 @@ function viewEmployees() {
     });
 }
 
-function createEmployeeTable(values) {
+function createTable(values) {
     if (values.length !== 0) {
         printTable(values);
     } else {
-        log(chalk.red('No employees are in your database.'))
+        log(chalk.red('Your database is empty. Please add information.'))
     };
 
     start();
@@ -142,12 +148,12 @@ function selectDepartment() {
             },
             ])
             .then((response) => {
-                viewDepartment(response);
+                viewEmployeeByDepartment(response);
             })
     });
 }
 
-function viewDepartment(response) {
+function viewEmployeeByDepartment(response) {
     const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name, roletable.title, department.name AS department, roletable.salary FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id`;
     connection.query(query, (err, res) => {
         if (err) throw err;
@@ -155,7 +161,7 @@ function viewDepartment(response) {
             return response.departmentName == name.department;
         })
 
-        createEmployeeTable(newTable);
+        createTable(newTable);
     });
 }
 
@@ -308,6 +314,14 @@ function viewRoles() {
     const query = 'SELECT roletable.id, roletable.title, roletable.salary, department.name AS department FROM roletable LEFT JOIN department on roletable.department_id = department.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        createEmployeeTable(res);
+        createTable(res);
+    });
+}
+
+function viewDepartments() {
+    const query = 'SELECT department.id, department.name AS department FROM department';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        createTable(res);
     });
 }
