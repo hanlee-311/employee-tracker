@@ -54,6 +54,7 @@ function start() {
                 'View All Employees by Department',
                 'View all Employees by Manager',
                 'Add Employee',
+                "Update Employee Information",
                 'Remove Employee',
                 'Exit',
             ],
@@ -71,6 +72,10 @@ function start() {
 
                 case 'View all Employees by Manager':
 
+                    break;
+
+                case 'Update Employee Information':
+                    updateEmployee();
                     break;
 
                 case 'Add Employee':
@@ -254,4 +259,42 @@ function removeEmployeeById(id, employee) {
         log(chalk.red(`You have removed ${employee} successfully!`));
         start();
     });
+}
+
+function updateEmployee() {
+    const query = 'SELECT CONCAT(employee.first_name, " ", employee.last_name) as name FROM employee';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Which employee would you like to update?`,
+                name: 'employeeName',
+                choices() {
+                    const choiceArray = [];
+                    res.forEach(({ name }) => {
+                        choiceArray.push(name);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name FROM employee`;
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    let oldEmployee = res.filter((employee) => {
+                        return response.employeeName == employee.name;
+                    })
+                    let id = JSON.parse(JSON.stringify(oldEmployee))[0].id
+                    updateEmployeeInformation(id, response.employeeName);
+                });
+            })
+    });
+}
+
+function updateEmployeeInformation(id, name) {
+    console.log(id, name);
+    start();
 }
