@@ -83,7 +83,7 @@ function start() {
                     break;
 
                 case 'Add Employee':
-                    addEmployee();
+                   getEmployees();
                     break;
 
                 case 'Remove Employee':
@@ -178,8 +178,18 @@ function viewEmployeeByDepartment(response) {
 }
 
 //functions to add a new employee
-function addEmployee() {
-    const query = 'SELECT * FROM roletable';
+function getEmployees() {
+    const query = 'SELECT CONCAT (employee.first_name, " ", employee.last_name) as name FROM employee'
+
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        addEmployee(res)
+    })
+}
+
+function addEmployee(manager) {
+    const query = `SELECT * FROM roletable`;
 
     connection.query(query, (err, res) => {
         if (err) throw err;
@@ -207,32 +217,51 @@ function addEmployee() {
                     return choiceArray;
                 },
             },
-                // {
-                //     type: 'input',
-                //     message: `Who is the employee's manager?`,
-                //     name: 'managerName',
-                // },
+            {
+                type: 'list',
+                message: `Who is the employee's manager`,
+                name: 'manager',
+                choices() {
+                    const choiceArray = [];
+                    manager.forEach(({ name }) => {
+                        choiceArray.push(name);
+                    });
+                    return choiceArray;
+                },
+            },
             ])
             .then((response) => {
-                connection.query(`SELECT roletable.id, roletable.title FROM roletable`, (err, res) => {
+                connection.query(`SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name FROM employee`, (err, res) => {
                     if (err) throw err;
 
-                    let roleInfo = res.filter((id) => {
-                        return response.employeeRole == id.title
-                    });
-                    let roleId = JSON.parse(JSON.stringify(roleInfo))[0].id
-                    addRoleAndInfo(roleId, response);
+                    let managerInfo = res.filter((id) => {
+                        return response.manager == id.name
+                    })
+
+                    let managerId = JSON.parse(JSON.stringify(managerInfo))[0].id
+
+                    connection.query(`SELECT roletable.id, roletable.title FROM roletable`, (err, res) => {
+                        if (err) throw err;
+    
+                        let roleInfo = res.filter((id) => {
+                            return response.employeeRole == id.title
+                        });
+                        let roleId = JSON.parse(JSON.stringify(roleInfo))[0].id
+                        addRoleAndInfo(roleId, response, managerId);
+                    })
+
                 })
             })
     })
 }
 
-function addRoleAndInfo(id, response) {
+function addRoleAndInfo(id, response, managerId) {
     connection.query(`INSERT INTO employee SET?`,
         {
             first_name: response.employeeFirstName,
             last_name: response.employeeLastName,
             role_id: id,
+            manager_id: managerId
         },
         (err) => {
             if (err) throw err;
