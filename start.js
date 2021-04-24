@@ -166,7 +166,7 @@ function selectDepartment() {
 }
 
 function viewEmployeeByDepartment(response) {
-    const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name, roletable.title, department.name AS department, roletable.salary FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id`;
+    const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name, roletable.title, department.name AS department, roletable.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id`;
     connection.query(query, (err, res) => {
         if (err) throw err;
         let newTable = res.filter((name) => {
