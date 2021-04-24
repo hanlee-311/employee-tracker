@@ -110,14 +110,7 @@ function start() {
         })
 }
 
-function viewEmployees() {
-    const query = 'SELECT employee.id, employee.first_name, employee.last_name, roletable.title, department.name AS department, roletable.salary, CONCAT (employee.first_name, " ", employee.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id';
-    connection.query(query, (err, res) => {
-        if (err) throw err;
-        createEmployeeTable(res);
-    });
-}
-
+//General functions used multiple times
 function createTable(values) {
     if (values.length !== 0) {
         printTable(values);
@@ -128,6 +121,16 @@ function createTable(values) {
     start();
 }
 
+//function to view all employees
+function viewEmployees() {
+    const query = 'SELECT employee.id, employee.first_name, employee.last_name, roletable.title, department.name AS department, roletable.salary, CONCAT (employee.first_name, " ", employee.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        createEmployeeTable(res);
+    });
+}
+
+//functions to view employees by department
 function selectDepartment() {
     const query = 'SELECT * FROM department';
     connection.query(query, (err, res) => {
@@ -165,6 +168,7 @@ function viewEmployeeByDepartment(response) {
     });
 }
 
+//functions to add a new employee
 function addEmployee() {
     const query = 'SELECT * FROM roletable';
 
@@ -229,6 +233,7 @@ function addRoleAndInfo(id, response) {
     )
 }
 
+//functions to remove an employee
 function removeEmployee() {
     const query = 'SELECT CONCAT(employee.first_name, " ", employee.last_name) as name FROM employee';
     connection.query(query, (err, res) => {
@@ -272,6 +277,7 @@ function removeEmployeeById(id, employee) {
     });
 }
 
+//functions to update an employee's information
 function updateEmployee() {
     const query = 'SELECT CONCAT(employee.first_name, " ", employee.last_name) as name FROM employee';
     connection.query(query, (err, res) => {
@@ -310,6 +316,7 @@ function updateEmployeeInformation(id, name) {
     start();
 }
 
+//functions to view roles and departments
 function viewRoles() {
     const query = 'SELECT roletable.id, roletable.title, roletable.salary, department.name AS department FROM roletable LEFT JOIN department on roletable.department_id = department.id';
     connection.query(query, (err, res) => {
