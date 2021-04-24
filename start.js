@@ -211,7 +211,6 @@ function addRoleAndInfo(id, response) {
             start();
         }
     )
-
 }
 
 function removeEmployee() {
@@ -234,11 +233,25 @@ function removeEmployee() {
             },
             ])
             .then((response) => {
-                console.log(response)
+                const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name FROM employee`;
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    let oldEmployee = res.filter((employee) => {
+                        return response.employeeName == employee.name;
+                    })
+                    let id = JSON.parse(JSON.stringify(oldEmployee))[0].id
+                    removeEmployeeById(id);
+                });
             })
     });
 }
 
+function removeEmployeeById(id) {
+    const query = `DELETE FROM employee WHERE id=${id}`;
 
-
-
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.log(`You have removed employee successfully!`);
+        start();
+    });
+}
