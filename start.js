@@ -78,7 +78,7 @@ function start() {
                     break;
 
                 case 'Remove Employee':
-
+                    removeEmployee();
                     break;
 
                 case 'Exit':
@@ -214,7 +214,30 @@ function addRoleAndInfo(id, response) {
 
 }
 
+function removeEmployee() {
+    const query = 'SELECT CONCAT(employee.first_name, " ", employee.last_name) as name FROM employee';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
 
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Which employee would you like to remove?`,
+                name: 'employeeName',
+                choices() {
+                    const choiceArray = [];
+                    res.forEach(({ name }) => {
+                        choiceArray.push(name);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                console.log(response)
+            })
+    });
+}
 
 
 
