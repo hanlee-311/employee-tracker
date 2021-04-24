@@ -58,6 +58,7 @@ function start() {
                 'Remove Employee',
                 'View Roles',
                 'View Departments',
+                'Add Roles',
                 'Exit',
             ],
         }
@@ -96,6 +97,9 @@ function start() {
                     viewDepartments();
                     break;
 
+                case 'Add Roles':
+                    addRoles();
+                    break;
 
                 case 'Exit':
                     log(chalk.yellow(`Goodbye! ${chalk.magenta(`ヾ(°∇°*)`)}`));
@@ -331,4 +335,64 @@ function viewDepartments() {
         if (err) throw err;
         createTable(res);
     });
+}
+
+//function to add a new role
+function addRoles() {
+    const query = 'SELECT * FROM department';
+
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        inquirer
+            .prompt([{
+                type: 'input',
+                message: `What is the title of the new role?`,
+                name: 'newRole',
+            },
+            {
+                type: 'input',
+                message: `What is the new role's salary?`,
+                name: 'salary',
+            },
+            {
+                type: 'list',
+                message: `Which department is this role under?`,
+                name: 'department',
+                choices() {
+                    const choiceArray = [];
+                    res.forEach(({ name }) => {
+                        choiceArray.push(name);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                connection.query(`SELECT department.id, department.name FROM department`, (err, res) => {
+                    if (err) throw err;
+
+                    let departmentInfo = res.filter((id) => {
+                        return response.department == id.name
+                    });
+                    let departmentID = JSON.parse(JSON.stringify(departmentInfo))[0].id;
+                    addDepartmentAndInfo(departmentID, response);
+                })
+            })
+    })
+}
+
+function addDepartmentAndInfo(id, response) {
+    connection.query(`INSERT INTO roletable SET?`,
+        {
+            title: response.newRole,
+            salary: response.salary,
+            department_id: id,
+        },
+        (err) => {
+            if (err) throw err;
+            log(chalk.green(`New role ${response.newRole} has been added to your database!`))
+            start();
+        }
+    )
 }
