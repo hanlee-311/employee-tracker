@@ -207,7 +207,7 @@ function addRoleAndInfo(id, response) {
         },
         (err) => {
             if (err) throw err;
-            console.log('Yay!');
+            log(chalk.green(`${response.employeeFirstName} ${response.employeeLastName} has been added to your database!`))
             start();
         }
     )
