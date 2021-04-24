@@ -240,18 +240,18 @@ function removeEmployee() {
                         return response.employeeName == employee.name;
                     })
                     let id = JSON.parse(JSON.stringify(oldEmployee))[0].id
-                    removeEmployeeById(id);
+                    removeEmployeeById(id, response.employeeName);
                 });
             })
     });
 }
 
-function removeEmployeeById(id) {
+function removeEmployeeById(id, employee) {
     const query = `DELETE FROM employee WHERE id=${id}`;
 
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.log(`You have removed employee successfully!`);
+        log(chalk.red(`You have removed ${employee} successfully!`));
         start();
     });
 }
