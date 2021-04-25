@@ -495,25 +495,40 @@ function removeRoles() {
                         return response.roleTitle == role.title;
                     })
                     let id = JSON.parse(JSON.stringify(roleId))[0].id
-                    removeRoleById(id);
+                    removeRoleById(id, response);
                 });
             })
     });
 }
 
-function removeRoleById(roleId) {
+function removeRoleById(roleId, response) {
     const query = 'SELECT employee.id, employee.role_id FROM employee'
     connection.query(query, (err, res) => {
+        let id; 
+
         if (err) throw err;
 
         let employeeRoleId = res.filter((id) => {
             return roleId == id.role_id;
         })
 
-        if (employeeRoleId !== null) {
-            log(chalk.red('Cannot delete role! An employee is currently assigned to that position. Please update employee role first before attempting to delete selected role.'))
+        if (employeeRoleId[0] == null) {
+            id = 0;
         } else {
-            start();
+            id = JSON.parse(JSON.stringify(employeeRoleId))[0].role_id;
+        }
+
+        if (id == roleId) {
+            log(chalk.red('Cannot delete role! An employee is currently assigned to that position. Please update employee role first before attempting to delete selected role.'))
+            removeRoles();
+        } else {
+            const query = `DELETE FROM roletable WHERE id=${roleId}`;
+
+            connection.query(query, (err, res) => {
+                if (err) throw err;
+                log(chalk.red(`You have removed ${response.roleTitle} successfully!`));
+                start();
+            });
         }
     })
 }
