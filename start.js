@@ -54,12 +54,14 @@ function start() {
                 'View All Employees by Department',
                 'View all Employees by Manager',
                 'Add Employee',
-                "Update Employee Information",
+                'Update Employee Information',
                 'Remove Employee',
                 'View Roles',
                 'View Departments',
                 'Add Roles',
                 'Remove Roles',
+                'Add Departments',
+                'Remove Departments',
                 'Total Utilized Budget By Department',
                 'Exit',
             ],
@@ -76,7 +78,7 @@ function start() {
                     break;
 
                 case 'View all Employees by Manager':
-
+                    selectManager();
                     break;
 
                 case 'Update Employee Information':
@@ -541,6 +543,40 @@ function removeRoleById(roleId, response) {
     })
 }
 
+
+
+
 function calculateBudget() {
     connection.end();
+}
+
+
+function selectManager() {
+    const query = 'SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS employee, roletable.title, department.name AS department, roletable.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id';
+
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        let managerId = res.filter((id) => {
+            return id.manager == null
+        })
+
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Under which manager would you like to view?`,
+                name: 'managerName',
+                choices() {
+                    const choiceArray = ['Cancel'];
+                    managerId.forEach(({ employee }) => {
+                        choiceArray.push(employee);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                console.log(response)
+            })
+    });
 }
