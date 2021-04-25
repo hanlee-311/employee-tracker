@@ -59,6 +59,7 @@ function start() {
                 'View Roles',
                 'View Departments',
                 'Add Roles',
+                'Remove Roles',
                 'Total Utilized Budget By Department',
                 'Exit',
             ],
@@ -100,6 +101,10 @@ function start() {
 
                 case 'Add Roles':
                     addRoles();
+                    break;
+
+                case 'Remove Roles':
+                    removeRoles();
                     break;
 
                 case 'Total Utilized Budget By Department':
@@ -374,12 +379,14 @@ function updateEmployeeInformation(id, name) {
             {
                 name: 'Do not update',
                 value: 'none'
-            }
-            ],
-        },
-        ])
+            }],
+        },])
         .then((response) => {
-            console.log(response);
+            if (response.update == 'none') {
+                start();
+            } else {
+                start();
+            }
         })
 }
 
@@ -458,6 +465,57 @@ function addDepartmentAndInfo(id, response) {
             start();
         }
     )
+}
+
+//functions to remove a role
+function removeRoles() {
+    const query = 'SELECT * FROM roletable';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Which role would you like to remove?`,
+                name: 'roleTitle',
+                choices() {
+                    const choiceArray = [];
+                    res.forEach(({ title }) => {
+                        choiceArray.push(title);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                const query = `SELECT roletable.id, roletable.title FROM roletable`;
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    let roleId = res.filter((role) => {
+                        return response.roleTitle == role.title;
+                    })
+                    let id = JSON.parse(JSON.stringify(roleId))[0].id
+                    removeRoleById(id);
+                });
+            })
+    });
+}
+
+function removeRoleById(roleId) {
+    const query = 'SELECT employee.id, employee.role_id FROM employee'
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        let employeeRoleId = res.filter((id) => {
+            return roleId == id.role_id;
+        })
+
+        if (employeeRoleId !== null) {
+            log(chalk.red('Cannot delete role! An employee is currently assigned to that position. Please update employee role first before attempting to delete selected role.'))
+        } else {
+            start();
+        }
+    })
 }
 
 function calculateBudget() {
