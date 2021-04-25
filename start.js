@@ -288,24 +288,28 @@ function removeEmployee() {
                 message: `Which employee would you like to remove?`,
                 name: 'employeeName',
                 choices() {
-                    const choiceArray = [];
+                    const choiceArray = ['Cancel'];
                     res.forEach(({ name }) => {
                         choiceArray.push(name);
                     });
-                    return choiceArray;
+                    return choiceArray
                 },
             },
             ])
             .then((response) => {
-                const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name FROM employee`;
-                connection.query(query, (err, res) => {
-                    if (err) throw err;
-                    let oldEmployee = res.filter((employee) => {
-                        return response.employeeName == employee.name;
-                    })
-                    let id = JSON.parse(JSON.stringify(oldEmployee))[0].id
-                    removeEmployeeById(id, response.employeeName);
-                });
+                if (response.employeeName == 'Cancel') {
+                    start();
+                } else {
+                    const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name FROM employee`;
+                    connection.query(query, (err, res) => {
+                        if (err) throw err;
+                        let oldEmployee = res.filter((employee) => {
+                            return response.employeeName == employee.name;
+                        })
+                        let id = JSON.parse(JSON.stringify(oldEmployee))[0].id
+                        removeEmployeeById(id, response.employeeName);
+                    });
+                }
             })
     });
 }
