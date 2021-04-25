@@ -83,7 +83,7 @@ function start() {
                     break;
 
                 case 'Add Employee':
-                   getEmployees();
+                    getEmployees();
                     break;
 
                 case 'Remove Employee':
@@ -242,7 +242,7 @@ function addEmployee(manager) {
 
                     connection.query(`SELECT roletable.id, roletable.title FROM roletable`, (err, res) => {
                         if (err) throw err;
-    
+
                         let roleInfo = res.filter((id) => {
                             return response.employeeRole == id.title
                         });
@@ -350,8 +350,37 @@ function updateEmployee() {
 }
 
 function updateEmployeeInformation(id, name) {
-    console.log(id, name);
-    start();
+    inquirer
+        .prompt([{
+            type: 'list',
+            message: `Which of ${name}'s information would you like to update?`,
+            name: 'update',
+            choices: [{
+                name: 'First Name',
+                value: 'first_name'
+            },
+            {
+                name: 'Last Name',
+                value: 'last_name'
+            },
+            {
+                name: 'Job Role',
+                value: 'title'
+            },
+            {
+                name: `${name}'s Manager`,
+                value: 'manager'
+            },
+            {
+                name: 'Do not update',
+                value: 'none'
+            }
+            ],
+        },
+        ])
+        .then((response) => {
+            console.log(response);
+        })
 }
 
 //functions to view roles and departments
