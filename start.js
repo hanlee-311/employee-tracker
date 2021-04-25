@@ -227,7 +227,7 @@ function addEmployee(manager) {
                 message: `Who is the employee's manager`,
                 name: 'manager',
                 choices() {
-                    const choiceArray = [];
+                    const choiceArray = ['None'];
                     manager.forEach(({ name }) => {
                         choiceArray.push(name);
                     });
@@ -239,11 +239,15 @@ function addEmployee(manager) {
                 connection.query(`SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name FROM employee`, (err, res) => {
                     if (err) throw err;
 
-                    let managerInfo = res.filter((id) => {
-                        return response.manager == id.name
-                    })
+                    let managerId;
 
-                    let managerId = JSON.parse(JSON.stringify(managerInfo))[0].id
+                    if (res.manager == 'None') {
+                        let managerInfo = res.filter((id) => {
+                            return response.manager == id.name
+                        })
+    
+                        managerId = JSON.parse(JSON.stringify(managerInfo))[0].id
+                    }
 
                     connection.query(`SELECT roletable.id, roletable.title FROM roletable`, (err, res) => {
                         if (err) throw err;
