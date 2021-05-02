@@ -395,8 +395,33 @@ function updateEmployeeInformation(id, name) {
             if (response.update == 'none') {
                 start();
             } else {
-                start();
+                if (response.update == 'first_name' || response.update == 'last_name') {
+                    updateName(id, response);
+                } 
+                if (response.update == 'title') {
+                    console.log('title')
+                } 
+                if (response.update == 'manager') {
+                    console.log('manager')
+                }
             }
+        })
+}
+
+function updateName(id, res) {
+    inquirer
+        .prompt([{
+            type: 'input',
+            message: `Please enter the new ${res.update}.`,
+            name: 'name',
+        },])
+        .then((response) => {
+            const query = `UPDATE employee SET ${res.update} = '${response.name}' WHERE id = ${id}`
+            connection.query(query, (err, res) => {
+                if (err) throw err;
+                log(chalk.green('Success! Employee name updated!'))
+                start();
+            });
         })
 }
 
