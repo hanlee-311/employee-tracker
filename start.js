@@ -184,6 +184,53 @@ function viewEmployeeByDepartment(response) {
     });
 }
 
+//functions to view employees by manager
+function selectManager() {
+    const query = 'SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS employee, roletable.title, department.name AS department, roletable.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id';
+
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        let managerId = res.filter((id) => {
+            return id.manager == null
+        })
+
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Under which manager would you like to view?`,
+                name: 'managerName',
+                choices() {
+                    const choiceArray = ['Cancel'];
+                    managerId.forEach(({ employee }) => {
+                        choiceArray.push(employee);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                if (response.managerName == 'Cancel') {
+                    start();
+                } else {
+                    viewEmployeesByManager(response);
+                }
+            })
+    });
+}
+
+function viewEmployeesByManager(response) {
+    const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name, roletable.title, department.name AS department, roletable.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        let newTable = res.filter((name) => {
+            return response.managerName == name.manager;
+        })
+
+        createTable(newTable);
+    });
+}
+
 //functions to add a new employee
 function getEmployees() {
     const query = 'SELECT CONCAT (employee.first_name, " ", employee.last_name) as name FROM employee'
@@ -243,13 +290,13 @@ function addEmployee(manager) {
 
                     let managerId;
 
-                    if (res.manager == 'None') {
+                    if (res.manager !== 'None') {
                         let managerInfo = res.filter((id) => {
                             return response.manager == id.name
                         })
     
                         managerId = JSON.parse(JSON.stringify(managerInfo))[0].id
-                    }
+                    } 
 
                     connection.query(`SELECT roletable.id, roletable.title FROM roletable`, (err, res) => {
                         if (err) throw err;
@@ -573,35 +620,4 @@ function removeRoleById(roleId, response) {
 
 function calculateBudget() {
     connection.end();
-}
-
-
-function selectManager() {
-    const query = 'SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS employee, roletable.title, department.name AS department, roletable.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id';
-
-    connection.query(query, (err, res) => {
-        if (err) throw err;
-
-        let managerId = res.filter((id) => {
-            return id.manager == null
-        })
-
-        inquirer
-            .prompt([{
-                type: 'list',
-                message: `Under which manager would you like to view?`,
-                name: 'managerName',
-                choices() {
-                    const choiceArray = ['Cancel'];
-                    managerId.forEach(({ employee }) => {
-                        choiceArray.push(employee);
-                    });
-                    return choiceArray;
-                },
-            },
-            ])
-            .then((response) => {
-                console.log(response)
-            })
-    });
 }
