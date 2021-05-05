@@ -109,6 +109,14 @@ function start() {
                     removeRoles();
                     break;
 
+                case 'Add Departments':
+                    addDepartment();
+                    break;
+
+                // case 'Remove Roles':
+                //     ;
+                //     break;
+
                 case 'Total Utilized Budget By Department':
                     calculateBudget();
                     break;
@@ -294,9 +302,9 @@ function addEmployee(manager) {
                         let managerInfo = res.filter((id) => {
                             return response.manager == id.name
                         })
-    
+
                         managerId = JSON.parse(JSON.stringify(managerInfo))[0].id
-                    } 
+                    }
 
                     connection.query(`SELECT roletable.id, roletable.title FROM roletable`, (err, res) => {
                         if (err) throw err;
@@ -444,10 +452,10 @@ function updateEmployeeInformation(id, name) {
             } else {
                 if (response.update == 'first_name' || response.update == 'last_name') {
                     updateName(id, response);
-                } 
+                }
                 if (response.update == 'title') {
                     console.log('title')
-                } 
+                }
                 if (response.update == 'manager') {
                     console.log('manager')
                 }
@@ -590,7 +598,7 @@ function removeRoles() {
 function removeRoleById(roleId, response) {
     const query = 'SELECT employee.id, employee.role_id FROM employee'
     connection.query(query, (err, res) => {
-        let id; 
+        let id;
 
         if (err) throw err;
 
@@ -617,6 +625,29 @@ function removeRoleById(roleId, response) {
             });
         }
     })
+}
+
+//functions to add a department
+function addDepartment() {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: `What is the name of this department?`,
+                name: 'department',
+            },
+        ])
+        .then((response) => {
+            connection.query(`INSERT INTO department SET?`,
+                {
+                    name: response.department
+                },
+                (err) => {
+                    if (err) throw err;
+                    log(chalk.green(`New department '${response.department}' has been added to your database!`))
+                    start();
+                }
+        )})
 }
 
 
