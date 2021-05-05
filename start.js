@@ -113,9 +113,9 @@ function start() {
                     addDepartment();
                     break;
 
-                // case 'Remove Roles':
-                //     ;
-                //     break;
+                case 'Remove Departments':
+                    removeDepartment();
+                    break;
 
                 case 'Total Utilized Budget By Department':
                     calculateBudget();
@@ -596,7 +596,7 @@ function removeRoles() {
 }
 
 function removeRoleById(roleId, response) {
-    const query = 'SELECT employee.id, employee.role_id FROM employee'
+    const query = 'SELECT employee.id, employee.role_id FROM employee';
     connection.query(query, (err, res) => {
         let id;
 
@@ -627,7 +627,7 @@ function removeRoleById(roleId, response) {
     })
 }
 
-//functions to add a department
+//function to add a department
 function addDepartment() {
     inquirer
         .prompt([
@@ -650,7 +650,76 @@ function addDepartment() {
         )})
 }
 
+//functions to remove a department
+function removeDepartment() {
+    const query = 'SELECT * FROM department';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
 
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Which department would you like to remove?`,
+                name: 'department',
+                choices() {
+                    const choiceArray = ['Cancel'];
+                    res.forEach(({ name }) => {
+                        choiceArray.push(name);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                const query = `SELECT department.id, department.name FROM department`;
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    if (response.department == 'Cancel') {
+                        start();
+                    } else {
+                        let departmentId = res.filter((role) => {
+                            return response.department == role.name;
+                        })
+                        let id = JSON.parse(JSON.stringify(departmentId))[0].id
+                        removeDepartmentById(id, response);
+                    }
+                });
+            })
+    });
+}
+
+function removeDepartmentById(departmentId, response) {
+    const query = 'SELECT employee.id, employee.role_id, roletable.department_id FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id';
+    connection.query(query, (err, res) => {
+
+        let id;
+
+        if (err) throw err;
+
+        let employeeRoleId = res.filter((id) => {
+            return departmentId == id.department_id;
+        })
+
+        if (employeeRoleId[0] == null) {
+            id = 0;
+        } else {
+            id = JSON.parse(JSON.stringify(employeeRoleId))[0].department_id;
+        }
+
+        if (id == departmentId) {
+            log(chalk.red('Cannot delete department! An employee is currently assigned to that department. Please update employee role first before attempting to delete selection.'))
+            removeRoles();
+        } else {
+            const query = `DELETE FROM department WHERE id=${departmentId}`;
+
+            connection.query(query, (err, res) => {
+                if (err) throw err;
+                log(chalk.red(`You have removed ${response.department} successfully!`));
+                start();
+            });
+        }
+    })
+}
 
 
 function calculateBudget() {
