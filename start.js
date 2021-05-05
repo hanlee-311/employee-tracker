@@ -561,7 +561,7 @@ function removeRoles() {
                 message: `Which role would you like to remove?`,
                 name: 'roleTitle',
                 choices() {
-                    const choiceArray = [];
+                    const choiceArray = ['Cancel'];
                     res.forEach(({ title }) => {
                         choiceArray.push(title);
                     });
@@ -573,11 +573,15 @@ function removeRoles() {
                 const query = `SELECT roletable.id, roletable.title FROM roletable`;
                 connection.query(query, (err, res) => {
                     if (err) throw err;
-                    let roleId = res.filter((role) => {
-                        return response.roleTitle == role.title;
-                    })
-                    let id = JSON.parse(JSON.stringify(roleId))[0].id
-                    removeRoleById(id, response);
+                    if (response.roleTitle == 'Cancel') {
+                        start();
+                    } else {
+                        let roleId = res.filter((role) => {
+                            return response.roleTitle == role.title;
+                        })
+                        let id = JSON.parse(JSON.stringify(roleId))[0].id
+                        removeRoleById(id, response);
+                    }
                 });
             })
     });
