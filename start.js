@@ -166,7 +166,7 @@ function selectDepartment() {
                 message: `Which department would you like to view?`,
                 name: 'departmentName',
                 choices() {
-                    const choiceArray = [];
+                    const choiceArray = ['Cancel'];
                     res.forEach(({ name }) => {
                         choiceArray.push(name);
                     });
@@ -175,7 +175,11 @@ function selectDepartment() {
             },
             ])
             .then((response) => {
-                viewEmployeeByDepartment(response);
+                if (response.departmentName == 'Cancel') {
+                    start();
+                } else {
+                    viewEmployeeByDepartment(response);
+                }
             })
     });
 }
