@@ -302,12 +302,14 @@ function addEmployee(manager) {
 
                     let managerId;
 
-                    if (res.manager !== 'None') {
+                    if (response.manager !== 'None') {
                         let managerInfo = res.filter((id) => {
                             return response.manager == id.name
                         })
 
                         managerId = JSON.parse(JSON.stringify(managerInfo))[0].id
+                    } else {
+                        managerId = null;
                     }
 
                     connection.query(`SELECT roletable.id, roletable.title FROM roletable`, (err, res) => {
@@ -458,10 +460,10 @@ function updateEmployeeInformation(id, name) {
                     updateName(id, response);
                 }
                 if (response.update == 'title') {
-                    console.log('title')
+                    updateRole(id, response);
                 }
                 if (response.update == 'manager') {
-                    console.log('manager')
+                    updateManager(id, response);
                 }
             }
         })
@@ -482,6 +484,63 @@ function updateName(id, res) {
                 start();
             });
         })
+}
+
+function updateRole(id, res) {
+    const query = `SELECT * FROM roletable`
+
+    connection.query(query, (err, response) => {
+        if (err) throw err;
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Please enter the new ${res.update}.`,
+                name: 'title',
+                choices() {
+                    const choiceArray = [];
+                    response.forEach(({ title , id }) => {
+                        var choiceObject = {
+                            name: title,
+                            value: id,
+                        }
+                        choiceArray.push(choiceObject);
+                    });
+                    return choiceArray;
+                },
+            },])
+            .then((userResponse) => {
+                const query = `UPDATE employee SET role_id = ${userResponse.title} WHERE id = ${id}`
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    log(chalk.green('Success! Employee name updated!'))
+                    start();
+                });
+            })
+    })
+}
+
+function updateManager(id, res) {
+    const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name FROM employee`
+
+    connection.query(query, (err, response) => {
+        if (err) throw err;
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Please enter the new ${res.update}.`,
+                name: 'title',
+                choices() {
+                    const choiceArray = [];
+                    response.forEach(({ name }) => {
+                        choiceArray.push(name);
+                    });
+                    return choiceArray;
+                },
+            },])
+            .then((response) => {
+               console.log(response)
+            })
+    })
 }
 
 //functions to view roles and departments
@@ -651,7 +710,8 @@ function addDepartment() {
                     log(chalk.green(`New department '${response.department}' has been added to your database!`))
                     start();
                 }
-        )})
+            )
+        })
 }
 
 //functions to remove a department
