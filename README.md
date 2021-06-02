@@ -1,139 +1,52 @@
-# Unit 12 MySQL Homework: Employee Tracker
+# Employee Tracker
 
-Developers are often tasked with creating interfaces that make it easy for non-developers to view and interact with information stored in databases. Often these interfaces are known as **C**ontent **M**anagement **S**ystems. In this homework assignment, your challenge is to architect and build a solution for managing a company's employees using node, inquirer, and MySQL.
+Need a way to organize your employees, their roles, and departments? Then try out this application for your organization! It's easy, simple, and straight-forward for any user. 
 
-## Instructions
+## Description 
+This application can tracks:
+- employees
+- roles
+- departments
 
-Design the following database schema containing three tables:
+### Step 1: Seed Your Database
+ ![Seeding The Database](./Assets/Employee-Tracker-Seeding-Database.gif)
 
-![Database Schema](Assets/schema.png)
+ You will need a database to start up your application. The database will need roles, departments, and employees. Dummy data has been provided for you. 
 
-* **department**:
+ ### Step 2: Start Up The Terminal
 
-  * **id** - INT PRIMARY KEY
-  * **name** - VARCHAR(30) to hold department name
+ In order to use the application, be sure to open up your terminal and type in 'node start' to begin the application.
 
-* **role**:
+ ![Start Screen](./Assets/start-screen.png)
 
-  * **id** - INT PRIMARY KEY
-  * **title** -  VARCHAR(30) to hold role title
-  * **salary** -  DECIMAL to hold role salary
-  * **department_id** -  INT to hold reference to department role belongs to
+ You will then be presented with a screen portraying all of your options. Using the arrow keys, scroll through them to select which option you would like to explore and use. When you are happy with your selection, press Enter to select.
 
-* **employee**:
+ There are many things you can do with this application! Please check out the features list below to see everything this application can offer you! You may also check out this link to see a short video on how each option works: 
 
-  * **id** - INT PRIMARY KEY
-  * **first_name** - VARCHAR(30) to hold employee first name
-  * **last_name** - VARCHAR(30) to hold employee last name
-  * **role_id** - INT to hold reference to role employee has
-  * **manager_id** - INT to hold reference to another employee that manages the employee being Created. This field may be null if the employee has no manager
-  
-Build a command-line application that at a minimum allows the user to:
+https://drive.google.com/file/d/104zOacTPB87V6oSe2TcaDeMeVIvTNQIp/view
 
-  * ✅Add departments, ✅roles, ✅employees
+Once you are done with your application, you can close out by clicking the Exit option.
 
-  * View ✅departments, ✅roles, ✅employees
+![Exit Screen](./Assets/end.png)
 
-  * Update employee roles
+ ## Features
+User can view
+- Employees, their ids, their managers, their roles, their salaries, and their departments
+- Sort and view employees by department or by manager
+- Roles, salaries of that role, role's department and role ids
+- Departments and their ids
+- Total utilized budget by department
+- If there is no information, the application will let the user know
 
-Bonus points if you're able to:
+User can update employee's
+- First name
+- Last name
+- Manager
+- Role
 
-  * Update employee managers
+User can remove
+- An employee
+- A role
+- A department
+- If that role or department is in use by an employee, the application will let the user know and prevent the user from deleting that role/department. 
 
-  * ✅View employees by manager
-
-  * Delete departments, ✅roles, and ✅employees
-
-  * View the total utilized budget of a department -- ie the combined salaries of all employees in that department
-
-We can frame this challenge as follows:
-
-```
-As a business owner
-I want to be able to view and manage the departments, roles, and employees in my company
-So that I can organize and plan my business
-```
-
-How do you deliver this? Here are some guidelines:
-
-* ✅Use the [MySQL](https://www.npmjs.com/package/mysql) NPM package to connect to your MySQL database and perform queries.
-
-* ✅Use [InquirerJs](https://www.npmjs.com/package/inquirer/v/0.2.3) NPM package to interact with the user via the command-line.
-
-* ✅Use [console.table](https://www.npmjs.com/package/console.table) to print MySQL rows to the console. There is a built-in version of `console.table`, but the NPM package formats the data a little better for our purposes.
-
-* You may wish to have a separate file containing functions for performing specific SQL queries you'll need to use. Could a constructor function or a class be helpful for organizing these?
-
-* You will need to perform a variety of SQL JOINS to complete this assignment, and it's recommended you review the week's activities if you need a refresher on this.
-
-![Employee Tracker](Assets/employee-tracker.gif)
-
-### Hints
-
-* ✅You may wish to include a `seed.sql` file to pre-populate your database. This will make development of individual features much easier.
-
-* Focus on getting the basic functionality completed before working on more advanced features.
-
-* Review the week's activities for a refresher on MySQL.
-
-* Check out [SQL Bolt](https://sqlbolt.com/) for some extra MySQL help.
-
-## Minimum Requirements
-
-* Functional application.
-
-* GitHub repository with a unique name and a README describing the project.
-
-* The command-line application should allow users to:
-
-  * ✅Add departments, roles, employees
-
-  * ✅View departments, roles, employees
-
-  * Update employee roles
-
-## Bonus
-
-* The command-line application should allow users to:
-
-  * Update employee managers
-
-  * ✅View employees by manager
-
-  * Delete departments, roles, and employees
-
-  * View the total utilized budget of a department -- ie the combined salaries of all employees in that department
-
-## Commit Early and Often
-
-One of the most important skills to master as a web developer is version control. Building the habit of committing via Git is important for two reasons:
-
-* Your commit history is a signal to employers that you are actively working on projects and learning new skills.
-
-* Your commit history allows you to revert your codebase in the event that you need to return to a previous state.
-
-Follow these guidelines for committing:
-
-* Make single-purpose commits for related changes to ensure a clean, manageable history. If you are fixing two issues, make two commits.
-
-* Write descriptive, meaningful commit messages so that you and anyone else looking at your repository can easily understand its history.
-
-* Don't commit half-done work, for the sake of your collaborators (and your future self!).
-
-* Test your application before you commit to ensure functionality at every step in the development process.
-
-We would like you to have well over 200 commits by graduation, so commit early and often!
-
-**Important**: You will be committing a file that contains your database credentials. Make sure your MySQL password is not used for any other personal accounts, because it will be visible on GitHub. In upcoming lessons, you will learn how to better secure this password, or you can start researching npm packages now that could help you.
-
-
-## Submission on BCS
-
-You are required to submit the following:
-
-* The URL of the GitHub repository
-
-* A video demonstrating the entirety of the app's functionality 
-
-- - -
-© 2021 Trilogy Education Services, LLC, a 2U, Inc. brand. Confidential and Proprietary. All Rights Reserved.
