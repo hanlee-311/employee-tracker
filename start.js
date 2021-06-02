@@ -803,7 +803,52 @@ function removeDepartmentById(departmentId, response) {
     })
 }
 
-
+//functions to calculate budget by department
 function calculateBudget() {
-    connection.end();
+    const query = 'SELECT * FROM department';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+
+        inquirer
+            .prompt([{
+                type: 'list',
+                message: `Which department would you like to view?`,
+                name: 'departmentName',
+                choices() {
+                    const choiceArray = ['Cancel'];
+                    res.forEach(({ name }) => {
+                        choiceArray.push(name);
+                    });
+                    return choiceArray;
+                },
+            },
+            ])
+            .then((response) => {
+                if (response.departmentName == 'Cancel') {
+                    start();
+                } else {
+                    calculateDepartment(response);
+                }
+            })
+    });
+}
+
+function calculateDepartment(response) {
+    const query = `SELECT roletable.title, department.name AS department, roletable.salary FROM employee LEFT JOIN roletable on employee.role_id = roletable.id LEFT JOIN department on roletable.department_id = department.id`;
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        let newTable = res.filter((name) => {
+            return response.departmentName == name.department;
+        })
+
+        let salaries = newTable.map(a => a.salary);
+
+        if (salaries.length !== 0) {
+            log(chalk.green(`Total cost of the ${response.departmentName} Department is ${chalk.yellow('$' + salaries.reduce((a, b) => a + b))}.`))
+        } else (
+            log(chalk.red(`There is currently no employees in this department to calculate a budget.`))
+        )
+
+        start();
+    });
 }
