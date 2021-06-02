@@ -12,6 +12,10 @@ This application can tracks:
  ![Seeding The Database](./Assets/Employee-Tracker-Seeding-Database.gif)
 
  You will need a database to start up your application. The database will need roles, departments, and employees. Dummy data has been provided for you. 
+ 
+ For a clearer video guide, please refer to the link below:
+
+ https://drive.google.com/file/d/14bWK-OCSTGw8XzWGMzhEYBiaVoiN6WCO/view
 
  ### Step 2: Start Up The Terminal
 
