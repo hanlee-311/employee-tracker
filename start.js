@@ -512,7 +512,7 @@ function updateRole(id, res) {
                 const query = `UPDATE employee SET role_id = ${userResponse.title} WHERE id = ${id}`
                 connection.query(query, (err, res) => {
                     if (err) throw err;
-                    log(chalk.green('Success! Employee name updated!'))
+                    log(chalk.green('Success! Employee role updated!'))
                     start();
                 });
             })
@@ -520,7 +520,7 @@ function updateRole(id, res) {
 }
 
 function updateManager(id, res) {
-    const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS name FROM employee`
+    const query = `SELECT employee.id, CONCAT (employee.first_name, " ", employee.last_name) AS managerName FROM employee`
 
     connection.query(query, (err, response) => {
         if (err) throw err;
@@ -528,17 +528,35 @@ function updateManager(id, res) {
             .prompt([{
                 type: 'list',
                 message: `Please enter the new ${res.update}.`,
-                name: 'title',
+                name: 'managerName',
                 choices() {
-                    const choiceArray = [];
-                    response.forEach(({ name }) => {
-                        choiceArray.push(name);
+                    const choiceArray = ['None'];
+                    response.forEach(({ managerName, id }) => {
+                        var choiceObject = {
+                            name: managerName,
+                            value: id,
+                        }
+                        choiceArray.push(choiceObject);
                     });
                     return choiceArray;
                 },
             },])
             .then((response) => {
-               console.log(response)
+                if (response.managerName == 'None') {
+                    const query = `UPDATE employee SET manager_id = NULL WHERE id = ${id}`
+                    connection.query(query, (err, res) => {
+                        if (err) throw err;
+                        log(chalk.green('Success! Employee manager updated!'))
+                        start();
+                    });
+                } else {
+                    const query = `UPDATE employee SET manager_id = ${response.managerName} WHERE id = ${id}`
+                    connection.query(query, (err, res) => {
+                        if (err) throw err;
+                        log(chalk.green('Success! Employee manager updated!'))
+                        start();
+                    });
+                }
             })
     })
 }
